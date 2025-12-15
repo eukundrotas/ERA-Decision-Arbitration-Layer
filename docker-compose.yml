@@ -1,0 +1,107 @@
+# ERA Decision & Arbitration Layer
+# Docker Compose Configuration
+#
+# Usage:
+#   1. Copy .env.example to .env and add your OPENROUTER_API_KEY
+#   2. docker-compose up -d        # Start all services
+#   3. docker-compose up dashboard # Start only dashboard
+#   4. docker-compose run cli --pool science --problem "Your question"
+
+version: '3.8'
+
+services:
+  # ============================================
+  # CLI Service - Run ERA DAL commands
+  # ============================================
+  cli:
+    build:
+      context: .
+      target: production
+    image: era-dal:latest
+    container_name: era-dal-cli
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./out:/app/out  # Persist output artifacts
+      - ./examples:/app/examples:ro  # Mount examples (read-only)
+    # Override command for interactive use
+    # docker-compose run cli --pool science --problem "What causes gravity?"
+    
+  # ============================================
+  # Dashboard Service - Real-time monitoring
+  # ============================================
+  dashboard:
+    build:
+      context: .
+      target: dashboard
+    image: era-dal:dashboard
+    container_name: era-dal-dashboard
+    ports:
+      - "${DASHBOARD_PORT:-8080}:8080"
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ============================================
+  # Test Runner - Development/CI
+  # ============================================
+  test:
+    build:
+      context: .
+      target: development
+    image: era-dal:dev
+    container_name: era-dal-test
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OPENROUTER_API_KEY=test-key  # Fake key for unit tests
+    volumes:
+      - ./:/app:ro
+      - ./out:/app/out
+    command: python -m pytest tests/ -v --tb=short
+
+  # ============================================
+  # Batch Processor - Process multiple problems
+  # ============================================
+  batch:
+    build:
+      context: .
+      target: production
+    image: era-dal:latest
+    container_name: era-dal-batch
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./out:/app/out
+      - ./examples:/app/examples:ro
+      - ./problems:/app/problems:ro  # Mount custom problems directory
+    # Example: process all problems from a file
+    command: ["--problems-file", "/app/problems/batch.txt", "--pool", "science", "--out-dir", "/app/out/batch"]
+
+# ============================================
+# Volumes for data persistence
+# ============================================
+volumes:
+  era-dal-output:
+    driver: local
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  default:
+    name: era-dal-network

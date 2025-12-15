@@ -1,6 +1,13 @@
 # ERA Decision & Arbitration Layer
 
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://img.shields.io/badge/tests-26%20passed-success.svg)](tests/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 **Надёжное принятие решений через ансамбль LLM, арбитраж, консенсус и самокритику.**
+
+🔗 **GitHub**: [https://github.com/eukundrotas/ERA-Decision-Arbitration-Layer](https://github.com/eukundrotas/ERA-Decision-Arbitration-Layer)
 
 ## Что это?
 
@@ -37,8 +44,8 @@ Final Answer + Artifacts
 ### 1. Установка
 
 ```bash
-git clone https://github.com/yourusername/era-dal.git
-cd era-dal
+git clone https://github.com/eukundrotas/ERA-Decision-Arbitration-Layer.git
+cd ERA-Decision-Arbitration-Layer
 
 cp .env.example .env
 # Заполните OPENROUTER_API_KEY в .env
@@ -197,6 +204,8 @@ MIT
 
 ---
 
-**Автор:** ERA Team  
+**Автор:** Eugene Kundrotas  
 **Версия:** 1.0.0  
-**Дата:** 2025-12-14
+**Дата:** December 15, 2025
+
+📧 **Contact**: [GitHub Issues](https://github.com/eukundrotas/ERA-Decision-Arbitration-Layer/issues)
